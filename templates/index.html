@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔍 TechStack Analyzer by Uplers/Mavlers</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 2rem 0;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header-content {
+            color: white;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo i {
+            font-size: 2.5rem;
+            color: #ffd700;
+        }
+
+        .logo h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        /* Main Content */
+        .main {
+            padding: 3rem 0;
+            flex: 1;
+        }
+
+        .search-card {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .search-card h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .search-card > p {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .input-wrapper {
+            position: relative;
+            flex: 1;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 1.1rem;
+        }
+
+        #urlInput {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        #urlInput:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .analyze-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .examples {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .examples p {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .example-links {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .example-link {
+            color: #667eea;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            background: rgba(102, 126, 234, 0.1);
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .example-link:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateY(-1px);
+        }
+
+        /* Loading Section */
+        .loading-card {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .loading-spinner i {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        /* Results styling */
+        .results-section {
+            margin-bottom: 3rem;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .category-icon {
+            font-size: 1.5rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .tech-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        @media (max-width: 768px) {
+            .input-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>TechStack Analyzer by Uplers/Mavlers</h1>
+                </div>
+                <p class="tagline">Discover the technology stack behind any website</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Search Section -->
+            <section class="search-section" id="searchSection">
+                <div class="search-card">
+                    <h2>Enter Website URL</h2>
+                    <p>Analyze any website to discover its technology stack, CMS, frameworks, and more</p>
+                    
+                    <form id="analyzeForm" class="search-form">
+                        <div class="input-group">
+                            <div class="input-wrapper">
+                                <i class="fas fa-globe input-icon"></i>
+                                <input 
+                                    type="text" 
+                                    id="urlInput" 
+                                    placeholder="Enter website URL (e.g., example.com)" 
+                                    required
+                                >
+                            </div>
+                            <button type="submit" class="analyze-btn" id="analyzeBtn">
+                                <i class="fas fa-search"></i>
+                                Analyze Website
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Examples -->
+                    <div class="examples">
+                        <p>Try these examples:</p>
+                        <div class="example-links">
+                            <span class="example-link" data-url="wordpress.org">wordpress.org</span>
+                            <span class="example-link" data-url="shopify.com">shopify.com</span>
+                            <span class="example-link" data-url="github.com">github.com</span>
+                            <span class="example-link" data-url="netlify.com">netlify.com</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Loading Section -->
+            <section class="loading-section hidden" id="loadingSection">
+                <div class="loading-card">
+                    <div class="loading-spinner">
+                        <i class="fas fa-cog fa-spin"></i>
+                    </div>
+                    <h3>Analyzing Website...</h3>
+                    <p id="loadingText">Scanning for technologies and frameworks</p>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section hidden" id="resultsSection">
+                <div class="results-header">
+                    <span id="analyzedUrl"></span>
+                    <button class="analyze-btn" id="newAnalysisBtn">Analyze New URL</button>
+                </div>
+                <div id="resultsGrid"></div>
+            </section>
+
+            <!-- Error Section -->
+            <section class="error-section hidden" id="errorSection">
+                <div class="loading-card">
+                    <i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i>
+                    <h3>Analysis Failed</h3>
+                    <p id="errorMessage">Unable to analyze the website.</p>
+                    <button class="analyze-btn" id="retryBtn">Try Again</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        class TechAnalyzer {
+            constructor() {
+                this.initializeElements();
+                this.attachEventListeners();
+            }
+
+            initializeElements() {
+                this.analyzeForm = document.getElementById('analyzeForm');
+                this.urlInput = document.getElementById('urlInput');
+                this.loadingSection = document.getElementById('loadingSection');
+                this.resultsSection = document.getElementById('resultsSection');
+                this.errorSection = document.getElementById('errorSection');
+                this.searchSection = document.getElementById('searchSection');
+                this.resultsGrid = document.getElementById('resultsGrid');
+                this.analyzedUrl = document.getElementById('analyzedUrl');
+                this.errorMessage = document.getElementById('errorMessage');
+                this.exampleLinks = document.querySelectorAll('.example-link');
+                this.newAnalysisBtn = document.getElementById('newAnalysisBtn');
+                this.retryBtn = document.getElementById('retryBtn');
+            }
+
+            attachEventListeners() {
+                this.analyzeForm.addEventListener('submit', (e) => this.handleAnalyze(e));
+                this.newAnalysisBtn.addEventListener('click', () => this.showSearchSection());
+                this.retryBtn.addEventListener('click', () => this.showSearchSection());
+                
+                this.exampleLinks.forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        const url = e.target.getAttribute('data-url');
+                        this.urlInput.value = url;
+                        this.handleAnalyze(e);
+                    });
+                });
+            }
+
+            async handleAnalyze(e) {
+                e.preventDefault();
+                
+                const url = this.urlInput.value.trim();
+                if (!url) {
+                    this.showError('Please enter a valid URL');
+                    return;
+                }
+
+                this.showLoadingSection();
+
+                try {
+                    const response = await fetch('/analyze', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ url: url })
+                    });
+
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        this.showResults(result);
+                    } else {
+                        this.showError(result.error || 'Analysis failed. Please try again.');
+                    }
+                } catch (error) {
+                    console.error('Analysis error:', error);
+                    this.showError('Network error. Please check your connection and try again.');
+                }
+            }
+
+            showSearchSection() {
+                this.hideAllSections();
+                this.searchSection.classList.remove('hidden');
+            }
+
+            showLoadingSection() {
+                this.hideAllSections();
+                this.loadingSection.classList.remove('hidden');
+            }
+
+            showResults(result) {
+                this.hideAllSections();
+                this.resultsSection.classList.remove('hidden');
+                this.analyzedUrl.textContent = `Analysis Results for: ${result.url}`;
+                
+                let html = '';
+                if (result.categories && Object.keys(result.categories).length > 0) {
+                    for (const [categoryName, technologies] of Object.entries(result.categories)) {
+                        html += `
+                            <div class="category-card">
+                                <div class="category-header">
+                                    <div class="category-icon" style="background: #667eea;">
+                                        <i class="fas fa-cog"></i>
+                                    </div>
+                                    <h3>${categoryName}</h3>
+                                </div>
+                        `;
+                        
+                        technologies.forEach(tech => {
+                            html += `
+                                <div class="tech-item">
+                                    <span style="font-weight: 600;">${tech.name}</span>
+                                    <span style="color: #666; font-size: 0.9rem;">${tech.method}</span>
+                                </div>
+                            `;
+                        });
+                        
+                        html += `</div>`;
+                    }
+                } else {
+                    html = `
+                        <div class="category-card">
+                            <h3>No Technologies Detected</h3>
+                            <p>We couldn't detect any specific technologies for this website.</p>
+                        </div>
+                    `;
+                }
+                
+                this.resultsGrid.innerHTML = html;
+            }
+
+            showError(message) {
+                this.hideAllSections();
+                this.errorSection.classList.remove('hidden');
+                this.errorMessage.textContent = message;
+            }
+
+            hideAllSections() {
+                [this.searchSection, this.loadingSection, this.resultsSection, this.errorSection].forEach(section => {
+                    section.classList.add('hidden');
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            new TechAnalyzer();
+        });
+    </script>
+</body>
+</html>
