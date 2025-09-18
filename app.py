@@ -17,43 +17,63 @@ app = Flask(__name__)
 
 class WebTechDetector:
     def __init__(self):
-        # Updated and more refined signatures
+        # Same comprehensive signatures as before but organized for web
         self.signatures = {
             'WordPress': {
                 'headers': [r'wp-json', r'wordpress'],
                 'html': [r'/wp-content/', r'/wp-includes/', r'/wp-admin/', r'wp-json', r'wp_enqueue_script', 
-                         r'wp-embed', r'wpml-', r'woocommerce', r'wp-block-', r'has-text-align', 
-                         r'wp-image-\d+', r'attachment-\d+', r'size-\w+', r'wp-caption'],
+                        r'wp-embed', r'wpml-', r'woocommerce', r'wp-block-', r'has-text-align', 
+                        r'wp-image-\d+', r'attachment-\d+', r'size-\w+', r'wp-caption'],
                 'meta': [r'<meta name="generator" content="WordPress'],
                 'paths': ['/wp-json/wp/v2/', '/wp-admin/', '/wp-login.php', '/xmlrpc.php'],
                 'css_classes': [r'wp-', r'post-\d+', r'page-id-\d+', r'category-', r'tag-'],
-                'js_vars': [r'wp\.', r'wpAjax', r'wc_', r'wordpress'],
-                'not_wordpress': [r'wp-bakery', r'woocommerce', r'wp-ecommerce']  # Exclude known plugins/themes
+                'js_vars': [r'wp\.', r'wpAjax', r'wc_', r'wordpress']
             },
             'Shopify': {
-                'headers': [r'shopify', r'X-Shopify-Stage'],
+                'headers': [r'shopify'],
                 'html': [r'cdn\.shopify\.com', r'shopify\.theme', r'/assets/shopify_', 
-                         r'shopify-checkout', r'Shopify\.routes', r'shop\.myshopify\.com'],
+                        r'shopify-checkout', r'Shopify\.routes', r'shop\.myshopify\.com'],
                 'paths': ['/cart.js', '/products.json', '/collections.json'],
                 'css_classes': [r'shopify-'],
-                'js_vars': [r'Shopify\.', r'ShopifyAPI'],
-                'not_shopify': [r'X-Wix-Render-Time', r'wix', r'ghost']  # Exclude known competitors like Wix, Ghost
-            },
-            'Shopify Plus': {
-                'headers': ['X-Shopify-Stage'],
-                'html': [r'checkout-plus.js'],
-                'js_vars': [r'ShopifyPlus']
+                'js_vars': [r'Shopify\.', r'ShopifyAPI']
             },
             'Drupal': {
                 'headers': [r'drupal', r'x-drupal'],
                 'html': [r'/sites/default/', r'/modules/', r'/themes/', r'drupal\.settings', 
-                         r'drupal-ajax', r'/core/themes/', r'data-drupal-'],
+                        r'drupal-ajax', r'/core/themes/', r'data-drupal-'],
                 'meta': [r'<meta name="generator" content="Drupal'],
                 'paths': ['/node/', '/admin/', '/user/login'],
                 'css_classes': [r'drupal-', r'node-', r'field-'],
                 'js_vars': [r'Drupal\.', r'drupalSettings']
             },
-            # More tech stacks can go here (React, WooCommerce, etc.)
+            'Next.js': {
+                'headers': [r'next\.js', r'next'],
+                'html': [r'_next/', r'__NEXT_DATA__', r'next\.js', r'nextjs', r'/_next/static/'],
+                'js_vars': [r'__NEXT_', r'Next\.']
+            },
+            'React': {
+                'html': [r'react\.js', r'data-reactroot', r'__REACT_DEVTOOLS_GLOBAL_HOOK__', 
+                        r'react-dom', r'/static/js/.*\.js'],
+                'js_vars': [r'React\.', r'ReactDOM\.']
+            },
+            'WooCommerce': {
+                'html': [r'woocommerce', r'/wc-ajax/', r'wc-setup', r'wc-', r'shop_table', 
+                        r'woocommerce-', r'product_cat-', r'wc_single_product'],
+                'css_classes': [r'woocommerce', r'wc-', r'product-'],
+                'js_vars': [r'wc_', r'woocommerce']
+            },
+            'Bootstrap': {
+                'html': [r'bootstrap\.css', r'bootstrap\.min\.css'],
+                'css_classes': [r'col-', r'btn', r'container', r'row']
+            },
+            'Tailwind CSS': {
+                'html': [r'tailwindcss', r'tailwind\.css'],
+                'css_classes': [r'flex', r'g-\w+', r'text-\w+', r'p-\d+', r'm-\d+']
+            },
+            'jQuery': {
+                'html': [r'jquery', r'jQuery'],
+                'js_vars': [r'\$\(', r'jQuery']
+            }
         }
 
     def analyze_website_web(self, url):
@@ -114,17 +134,11 @@ class WebTechDetector:
 
     def _analyze_html(self, html_content):
         detected = {}
-        
         for tech, patterns in self.signatures.items():
-            # Skip WordPress detection if we've already identified it as something else
-            if tech == 'WordPress' and 'not_wordpress' in patterns:
-                if any(re.search(pat, html_content) for pat in patterns['not_wordpress']):
-                    continue  # Skip WordPress detection for these cases
-            
             if 'html' in patterns:
                 for pattern in patterns['html']:
                     if re.search(pattern, html_content, re.IGNORECASE):
-                        detected[tech] = "HTML content match"
+                        detected[tech] = "HTML content"
                         break
         return detected
 
@@ -246,7 +260,8 @@ class WebTechDetector:
         return {
             'categories': result_categories,
             'headers': dict(headers),
-            'url': url
+            'url': url,
+            'meta_info': {k: v for k, v in detected_tech.items() if k.endswith('Meta')}
         }
 
 # Initialize detector
@@ -256,6 +271,7 @@ detector = WebTechDetector()
 def index():
     return render_template('index.html')
 
+# ADD THIS NEW ROUTE
 @app.route('/analyze', methods=['POST'])
 def analyze():
     try:
@@ -265,12 +281,17 @@ def analyze():
         if not url:
             return jsonify({'success': False, 'error': 'URL is required'})
         
+        print(f"Analyzing URL: {url}")  # Debug print
+        
         # Run analysis
         result = detector.analyze_website_web(url)
+        
+        print(f"Analysis result: {result}")  # Debug print
         
         return jsonify(result)
         
     except Exception as e:
+        print(f"Error in analyze route: {str(e)}")  # Debug print
         return jsonify({
             'success': False, 
             'error': f'Server error: {str(e)}',
